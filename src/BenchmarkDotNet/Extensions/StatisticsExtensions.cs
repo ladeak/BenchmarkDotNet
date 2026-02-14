@@ -101,6 +101,8 @@ namespace BenchmarkDotNet.Extensions
             builder.Append(listSeparator);
             builder.Append(" MValue = ");
             builder.Append(mValue.ToString("0.##", cultureInfo));
+            if (s.CenterBounds is { })
+                builder.Append($" CenterBounds = [{formatter(s.CenterBounds.Lower)}; {formatter(s.CenterBounds.Upper)}]");
             builder.AppendLine();
 
             if (calcHistogram)

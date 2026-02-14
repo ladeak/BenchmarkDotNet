@@ -40,14 +40,17 @@ namespace BenchmarkDotNet.Mathematics
         internal ConfidenceInterval PerfolizerConfidenceInterval { get; }
         public LegacyConfidenceInterval ConfidenceInterval { get; }
         public PercentileValues Percentiles { get; }
+        internal Bounds? CenterBounds { get; }
 
         private readonly TukeyOutlierDetector outlierDetector;
 
         public Statistics(params double[] values) :
-            this(values.ToList()) { }
+            this(values.ToList())
+        { }
 
         public Statistics(IEnumerable<int> values) :
-            this(values.Select(value => (double)value)) { }
+            this(values.Select(value => (double)value))
+        { }
 
         public Statistics(IEnumerable<double> values) : this(new Sample(values.ToArray(), TimeUnit.Nanosecond)) { }
 
@@ -85,6 +88,8 @@ namespace BenchmarkDotNet.Mathematics
             PerfolizerConfidenceInterval = ConfidenceIntervalEstimator.ConfidenceInterval(ConfidenceLevel.L999);
             ConfidenceInterval = new LegacyConfidenceInterval(PerfolizerConfidenceInterval.Estimation, StandardError, N, LegacyConfidenceLevel.L999);
             Percentiles = new PercentileValues(Sample.SortedValues);
+            if (N > 1)
+                CenterBounds = Toolkit.CenterBounds(Sample, Math.Pow(2, 1 - N));
         }
 
         [PublicAPI] public ConfidenceInterval GetConfidenceInterval(ConfidenceLevel level) => ConfidenceIntervalEstimator.ConfidenceInterval(level);
